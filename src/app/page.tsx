@@ -41,6 +41,52 @@ export default function Home() {
     }
   };
 
+  const handleCountIncrement = async () => {
+    if (typeof window.ethereum != "undefined") {
+      //connect to BC using ethers provider
+      const provider = new ethers.BrowserProvider(window.ethereum);
+      // set signer to interact with BC
+      const signer = await provider.getSigner();
+      // set interaction btw contract abi and address
+      const contract: ethers.Contract = new ethers.Contract(
+        counterAddress,
+        abi,
+        signer
+      );
+      console.log("contract", contract);
+
+      try {
+        const tx = await contract.increaseCount();
+        await tx.wait();
+        getCount();
+      } catch (err) {
+        console.log("error incrementing count:", err);
+      }
+    }
+  };
+
+  const handleCountDecrement = async () => {
+    if (typeof window.ethereum != "undefined") {
+      //connect to BC using ethers provider
+      const provider = new ethers.BrowserProvider(window.ethereum);
+      //set signer to interact with BC
+      const signer = await provider.getSigner();
+      //set interaction btw contract abi, address and signer
+      const contract: ethers.Contract = new ethers.Contract(
+        counterAddress,
+        abi,
+        signer
+      );
+      try {
+        const tx = await contract.decreaseCount();
+        await tx.wait();
+        getCount();
+      } catch (err) {
+        console.log("Error on decrementing count:", err);
+      }
+    }
+  };
+
   return (
     <main className="flex min-h-screen flex-col items-center p-24">
       <h1 className="text-emerald-800 text-xl font-extrabold text-center mb-5">
@@ -60,13 +106,28 @@ export default function Home() {
           onClick={getCount}
           className="group rounded-lg border border-emerald-300 m-6 px-5 py-4 bg-gray-100 text-emerald-800 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
         >
-          Get count{" "}
+          Get count
         </button>
         {count ? (
           <p>
             Here is the count from our solidity contract : <b>{count}</b>
           </p>
         ) : null}
+        <p>Press buttons below to interact with the counter</p>
+        <div className="grid grid-cols-2">
+          <button
+            onClick={handleCountDecrement}
+            className="text-emerald-800 text-xl font-extrabold group rounded-lg border border-emerald-300 m-6 px-5 py-4 bg-gray-100 text-emerald-800 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
+          >
+            -
+          </button>
+          <button
+            onClick={handleCountIncrement}
+            className="text-emerald-800 text-xl font-extraboldgroup rounded-lg border border-emerald-300 m-6 px-5 py-4 bg-gray-100 text-emerald-800 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
+          >
+            +
+          </button>
+        </div>
       </div>
     </main>
   );
